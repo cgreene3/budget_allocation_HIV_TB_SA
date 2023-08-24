@@ -1,0 +1,13 @@
+measure,location,sex,age,cause,metric,year,val,upper,lower
+Deaths,South Africa,Both,50-54 years,HIV/AIDS,Number,2017,15955.793057472983,19103.593499015,13190.523284530002
+Deaths,South Africa,Both,55-59 years,HIV/AIDS,Number,2017,10290.317974841906,12148.4547882275,8801.6263193275
+Deaths,South Africa,Both,15-49 years,HIV/AIDS,Number,2017,123959.46508363987,168848.8629455125,94673.314175755
+Deaths,South Africa,Both,50-54 years,Multidrug-resistant tuberculosis without extensive drug resistance,Number,2017,103.62739875798471,230.67676915310938,35.89649111021263
+Deaths,South Africa,Both,55-59 years,Multidrug-resistant tuberculosis without extensive drug resistance,Number,2017,124.24260808043759,275.7247592885475,44.258804215753834
+Deaths,South Africa,Both,15-49 years,Multidrug-resistant tuberculosis without extensive drug resistance,Number,2017,373.1654138800776,807.4662979649561,129.67888751785043
+Deaths,South Africa,Both,50-54 years,Extensively drug-resistant tuberculosis,Number,2017,1.3033439118957972,2.9307071499309987,0.43995912545690835
+Deaths,South Africa,Both,55-59 years,Extensively drug-resistant tuberculosis,Number,2017,1.5624167070493769,3.5206663329857584,0.5277022795571621
+Deaths,South Africa,Both,15-49 years,Extensively drug-resistant tuberculosis,Number,2017,4.693311041953879,11.051403833254932,1.5289089759603733
+Deaths,South Africa,Both,50-54 years,Drug-susceptible tuberculosis,Number,2017,1870.0100238128293,2223.424167699968,1519.9863225264867
+Deaths,South Africa,Both,55-59 years,Drug-susceptible tuberculosis,Number,2017,2206.8994169862412,2481.3046237071894,1942.195063059357
+Deaths,South Africa,Both,15-49 years,Drug-susceptible tuberculosis,Number,2017,6860.003317837381,8233.056002916395,5665.959867687189
