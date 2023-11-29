@@ -30,7 +30,7 @@ Above is an illustration of the rates of flow for the TB and HIV dynamic transmi
 #### Example Illustration of Pareto Optimal Solutions Returned by the Multi-Objective Optimization Approach 
 <figure>
   <img
-  src="./results/pareto_optimal_graphs/pareto_graph.png"
+  src="./documentation/figures/pareto_graph.png"
   alt="Pareto Optimal Graph Example.">
 </figure>
 
