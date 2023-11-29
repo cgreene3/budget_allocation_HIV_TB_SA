@@ -13,38 +13,36 @@ sapply(c('dplyr', 'deSolve',
          'varhandle'), require, character.only=T)
 
 
-####NOT UPDATED RAN LOCALLY###
 # # ####HYAK OR GITHUB SPECIFIC CODES TO COMMENT/UNCOMMENT####
 #hyak specific code
 
-#set # of args to # of general parameter sets
 
-#args = commandArgs(trailingOnly=TRUE)
-# if (length(args)==0) {
-#   stop("At least one argument must be supplied (input file).n", call.=FALSE)
-# } else if (length(args)>1) {
-#   stop("only need one parameter", call.=FALSE)
- #}
+args = commandArgs(trailingOnly=TRUE)
+ if (length(args)==0) {
+   stop("At least one argument must be supplied (input file).n", call.=FALSE)
+ } else if (length(args)>1) {
+   stop("only need one parameter", call.=FALSE)
+ }
 
 #args_temp<- as.integer(args[1])
+region_id_temp<-as.integer(args[1])
 
 # # #location where input parameters are
-#indir<-'/gscratch/icrc/cgreene3/SA_resource_allocation/input_parameters'
+indir<-'/gscratch/icrc/cgreene3/SA_resource_allocation/input_parameters'
 # # #
 # # # #location where want outputs
-#outdir<-paste0('/gscratch/icrc/cgreene3/SA_resource_allocation/calibration_outputs/', 
-#               region_name_temp)
+outdir<-paste0('/gscratch/icrc/cgreene3/SA_resource_allocation/program_runs/metrics')
 
 # # # #if running from github
-library(here)
+#library(here)
 #if running from local set env to resource_allocation_HIV_TB_SA
-#args_temp<-259
+#region_id_temp<-1
 
 #location where input parameters are
-indir<-paste0(here(), '/param_files/input_parameters')
+#indir<-paste0(here(), '/param_files/input_parameters')
 
 #location where want outputs
-outdir<-paste0(here(), '/results/program_runs/metrics')
+#outdir<-paste0(here(), '/results/program_runs/metrics')
 
 ########Time Horizon and Evaluation intervals (1 month)#####
 time_interval <- 1/12
@@ -892,7 +890,6 @@ tb_hiv_prog_calibration_model <- function(time, N_t_r_h_g, parms){
 }
 
 ########Feed paramters into desolve########
-setwd(outdir)
 sim_id_current_eval<-0
 
 current_program_eval<-1 
@@ -901,7 +898,7 @@ current_yr<-start_yr_warmup
 last_yr<-start_yr_warmup-1
 
 
-for(region_id_temp in region_id_ref_df$region_id){
+#for(region_id_temp in region_id_ref_df$region_id){
   
   region_name_temp <- region_id_ref_df$region_name[region_id_temp]
   init_region_list<-input_data_param_extraction(region_name_temp)
@@ -1010,7 +1007,7 @@ for(region_id_temp in region_id_ref_df$region_id){
     out_df$n_art_t_male_per_100K_ppl<-rowSums(out_df[,1+c(N_t_r_h_g_ref[TB_SET, DR_SET, 4,1])])/out_df$hiv_prev_t_male_per_100K_ppl
     out_df$n_art_t_female_per_100K_ppl<-rowSums(out_df[,1+c(N_t_r_h_g_ref[TB_SET, DR_SET, 4,2])])/out_df$hiv_prev_t_female_per_100K_ppl
     
-    
+    out_df$n_art<-rowSums(out_df[,1+c(N_t_r_h_g_ref[TB_SET, DR_SET,4,G_SET])])
     
     #initialize summarised eval metrics
     summarised_eval_metrics_df_all<-out_df%>%
@@ -1031,7 +1028,8 @@ for(region_id_temp in region_id_ref_df$region_id){
                 HIV_prev_Y_100k_ppl = mean(hiv_prev),
                 ART_coverage_Y_100K_males = mean(n_art_t_male_per_100K_ppl),
                 ART_coverage_Y_100K_females = mean(n_art_t_female_per_100K_ppl),
-                TB_prev_Y_100K_ppl = mean(tb_prev))%>%
+                TB_prev_Y_100K_ppl = mean(tb_prev),
+                avg_on_ART_Y_per_100K_ppl = mean(n_art))%>%
       filter(year >= 1990,
              year <= 2017)%>%
       mutate(general_sim_id = general_sim_id,
@@ -1063,6 +1061,8 @@ for(region_id_temp in region_id_ref_df$region_id){
       out_df2$art_coverage<-rowSums(out_df2[,1+c(N_t_r_h_g_ref[TB_SET, DR_SET,4,G_SET])])/out_df2$hiv_prev
       out_df2$tb_prev<-rowSums(out_df2[,1+c(N_t_r_h_g_ref[6, DR_SET,HIV_SET,G_SET])])
       
+      out_df2$n_art<-rowSums(out_df2[,1+c(N_t_r_h_g_ref[TB_SET, DR_SET,4,G_SET])])
+      
       summarised_eval_metrics_df_intervention<-out_df2%>%
         mutate(year = as.integer(time + start_yr_eval))%>%
         mutate(TB_inc_per_100k_ppl = lead(cum_TB_inc)-cum_TB_inc,
@@ -1081,7 +1081,8 @@ for(region_id_temp in region_id_ref_df$region_id){
                   HIV_prev_Y_100k_ppl = mean(hiv_prev),
                   ART_coverage_Y_100K_males = mean(n_art_t_male_per_100K_ppl),
                   ART_coverage_Y_100K_females = mean(n_art_t_female_per_100K_ppl),
-                  TB_prev_Y_100K_ppl = mean(tb_prev))%>%
+                  TB_prev_Y_100K_ppl = mean(tb_prev),
+                  avg_on_ART_Y_per_100K_ppl = mean(n_art))%>%
         filter(year <= 2027)%>%
         mutate(general_sim_id = general_sim_id,
                regional_sim_id = regional_sim_id,
@@ -1104,4 +1105,4 @@ for(region_id_temp in region_id_ref_df$region_id){
                  "regional sim id", regional_sim_id))
     print(completion_time)
   }
-}
+#}

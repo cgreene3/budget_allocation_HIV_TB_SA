@@ -5,14 +5,14 @@ rm(list = ls())
 gc()
 
 #load packages
-sapply(c('dplyr', 
+sapply(c('dplyr', 'deSolve', 
          'readxl', 'stringr', 
          'reshape2', 'ggplot2', 
          'varhandle'), require, character.only=T)
 
 itr_id<-1
 
-region_name_temp<-"Eastern Cape" #itr_id 1
+#region_name_temp<-"Eastern Cape" #itr_id 1
 #region_name_temp<-"Free State" #itr_id 2
 #region_name_temp<-"Gauteng"#itr_id 3
 #region_name_temp<-"KwaZulu-Natal" #itr_id 4
@@ -20,7 +20,7 @@ region_name_temp<-"Eastern Cape" #itr_id 1
 #region_name_temp<-"Mpumalanga" #itr_id 6
 #region_name_temp<-"Northern Cape" #itr_id 7
 #region_name_temp<-"North-West" #itr_id 8
-#region_name_temp<-"Western Cape" #itr_id 9
+region_name_temp<-"Western Cape" #itr_id 9
 
 ####HYAK OR GITHUB SPECIFIC CODES TO COMMENT/UNCOMMENT####
 ###HYAK###
@@ -150,3 +150,191 @@ write.csv(general_accepted_calibration_sets_ref,
           paste0('general_accepted_calibration_sets_ref_df',
                  itr_id, '.csv'), 
           row.names = FALSE)
+
+# ###graphs
+# library(RColorBrewer)
+# 
+# colors_for_graphs <- brewer.pal(n = 10, name = "Paired")
+# colors_for_program_graph_fill<-colors_for_graphs[c(1, 3, 5)]
+# colors_for_program_graph_line<-colors_for_graphs[c(2, 4, 6)]
+# 
+# ###TBHIV mort rate###
+# graph_calib_TBHIV_mort_rate<-outputs_combined_df_reshape%>%
+#   filter(grepl('mort', variable) == TRUE)%>%
+#   group_by(sim_id, year)%>%
+#   summarise(value = sum(value))%>%
+#   filter(sim_id %in% accepted_calibration_sets_ref_df$sim_id)%>%
+#   group_by(year)%>%
+#   summarise(lower_rate = min(value),
+#             upper_rate = max(value),
+#             val_rate = mean(value))%>%
+#   mutate(group = 'Model Projections')
+# 
+# graph_gbd_TBHIV_mort_rate<-TBHIV_mort_df%>%
+#   select(-c('region_name'))%>%
+#   mutate(group = 'GBD Projections')%>%
+#   filter(year <= 2017)
+# 
+# TBHIV_mort_graph<-rbind(graph_calib_TBHIV_mort_rate, 
+#                         graph_gbd_TBHIV_mort_rate)
+# 
+# max_min_graph_y_axis<-c(0, 2500, 500)
+# 
+# 
+# TBHIV_mort_rate_graph_temp<-ggplot(TBHIV_mort_graph)+
+#   geom_ribbon(aes(ymin = lower_rate, ymax = upper_rate, x = year, fill = group))+
+#   geom_point(aes(x = year, y = val_rate, colour = group, shape = group), size = 2)+
+#   geom_segment(x = 2017-0.2, y = unlist(graph_gbd_TBHIV_mort_rate%>%
+#                                           filter(year == 2017)%>%
+#                                           select(c("lower_rate"))), 
+#                xend = 2017-0.2, yend = min(unlist(graph_gbd_TBHIV_mort_rate%>%
+#                                                     filter(year == 2017)%>%
+#                                                     select(c("upper_rate"))), 
+#                                            max_min_graph_y_axis[2]), 
+#                col = "darkblue", size = 1.2, 
+#                arrow = arrow(ends = "both", angle = 90, length = unit(.2,"cm")))+
+#   geom_segment(x = 2005-0.2, y = unlist(graph_gbd_TBHIV_mort_rate%>%
+#                                           filter(year == 2005)%>%
+#                                           select(c("lower_rate"))), 
+#                xend = 2005-0.2, yend = min(unlist(graph_gbd_TBHIV_mort_rate%>%
+#                                                     filter(year == 2005)%>%
+#                                                     select(c("upper_rate"))), max_min_graph_y_axis[2]), 
+#                col = "darkblue", size = 1.2, 
+#                arrow = arrow(ends = "both", angle = 90, length = unit(.2,"cm")))+
+#   theme(text = element_text(size=18, family="Times New Roman"), 
+#         panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+#         panel.background = element_blank(), axis.line = element_line(colour = "black"),
+#         legend.position="top", legend.title = element_blank(), legend.text=element_text(size=22),
+#         plot.title = element_text(hjust = .5, size=18),
+#         legend.background = element_rect(colour = "lightgrey"),
+#         legend.box.background = element_rect(colour = "black"))+
+#   scale_x_continuous(name = 'y', breaks=c(seq(from = 1990, to = 2017, by = 3)))+
+#   scale_color_manual(values=c(colors_for_program_graph_line))+
+#   scale_fill_manual(values=c(colors_for_program_graph_fill))+
+#   ylab('TB/HIV Disease mortality rate,\n per 100K individuals')+
+#   scale_shape_manual(values=c(16, 8))
+# 
+# ###TB incidence###
+# graph_calib_TB_inc_rate<-outputs_combined_df_reshape%>%
+#   filter(grepl('inc', variable) == TRUE)%>%
+#   filter(sim_id %in% accepted_calibration_sets_ref_df$sim_id)%>%
+#   group_by(year)%>%
+#   summarise(lower_rate = min(value),
+#             upper_rate = max(value),
+#             val_rate = mean(value))%>%
+#   mutate(group = 'Model Projections')
+# 
+# graph_gbd_TBinc_rate<-TB_inc_df%>%
+#   select(-c('region_name'))%>%
+#   mutate(group = 'GBD Projections')%>%
+#   filter(year <= 2017)
+# 
+# TB_inc_graph<-rbind(graph_calib_TB_inc_rate, 
+#                         graph_gbd_TBinc_rate)
+# 
+# max_min_graph_y_axis<-c(0, 2500, 500)
+# 
+# 
+# TB_inc_rate_graph_temp<-ggplot(TB_inc_graph)+
+#   geom_ribbon(aes(ymin = lower_rate, ymax = upper_rate, x = year, fill = group))+
+#   geom_point(aes(x = year, y = val_rate, colour = group, shape = group), size = 2)+
+#   geom_segment(x = 2017-0.2, y = unlist(graph_gbd_TBinc_rate%>%
+#                                           filter(year == 2017)%>%
+#                                           select(c("lower_rate"))), 
+#                xend = 2017-0.2, yend = min(unlist(graph_gbd_TBinc_rate%>%
+#                                                     filter(year == 2017)%>%
+#                                                     select(c("upper_rate"))), 
+#                                            max_min_graph_y_axis[2]), 
+#                col = "darkblue", size = 1.2, 
+#                arrow = arrow(ends = "both", angle = 90, length = unit(.2,"cm")))+
+#   geom_segment(x = 2005-0.2, y = unlist(graph_gbd_TBinc_rate%>%
+#                                           filter(year == 2005)%>%
+#                                           select(c("lower_rate"))), 
+#                xend = 2005-0.2, yend = min(unlist(graph_gbd_TBinc_rate%>%
+#                                                     filter(year == 2005)%>%
+#                                                     select(c("upper_rate"))), max_min_graph_y_axis[2]), 
+#                col = "darkblue", size = 1.2, 
+#                arrow = arrow(ends = "both", angle = 90, length = unit(.2,"cm")))+
+#   theme(text = element_text(size=18, family="Times New Roman"), 
+#         panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+#         panel.background = element_blank(), axis.line = element_line(colour = "black"),
+#         legend.position="top", legend.title = element_blank(), legend.text=element_text(size=22),
+#         plot.title = element_text(hjust = .5, size=18),
+#         legend.background = element_rect(colour = "lightgrey"),
+#         legend.box.background = element_rect(colour = "black"))+
+#   scale_x_continuous(name = 'y', breaks=c(seq(from = 1990, to = 2017, by = 3)))+
+#   scale_color_manual(values=c(colors_for_program_graph_line))+
+#   scale_fill_manual(values=c(colors_for_program_graph_fill))+
+#   ylab('TB incidence rate,\n per 100K individuals')+
+#   scale_shape_manual(values=c(16, 8))
+# 
+# 
+# ###HIV prevalence###
+# graph_calib_HIV_prev_rate<-outputs_combined_df_reshape%>%
+#   filter(grepl('hiv_prev', variable) == TRUE)%>%
+#   filter(sim_id %in% accepted_calibration_sets_ref_df$sim_id)%>%
+#   group_by(year)%>%
+#   summarise(lower_rate = min(value),
+#             upper_rate = max(value),
+#             val_rate = mean(value))%>%
+#   mutate(group = 'Model Projections')
+# 
+# graph_gbd_HIV_prev_rate<-HIV_prev_df%>%
+#   select(-c('region_name'))%>%
+#   mutate(group = 'GBD Projections')%>%
+#   filter(year <= 2017)
+# 
+# HIV_prev_graph<-rbind(graph_calib_HIV_prev_rate, 
+#                     graph_gbd_HIV_prev_rate)
+# 
+# max_min_graph_y_axis<-c(0, 35000, 5000)
+# 
+# 
+# HIV_prev_rate_graph_temp<-ggplot(HIV_prev_graph)+
+#   geom_ribbon(aes(ymin = lower_rate, ymax = upper_rate, x = year, fill = group))+
+#   geom_point(aes(x = year, y = val_rate, colour = group, shape = group), size = 2)+
+#   geom_segment(x = 2017-0.2, y = unlist(graph_gbd_HIV_prev_rate%>%
+#                                           filter(year == 2017)%>%
+#                                           select(c("lower_rate"))), 
+#                xend = 2017-0.2, yend = min(unlist(graph_gbd_HIV_prev_rate%>%
+#                                                     filter(year == 2017)%>%
+#                                                     select(c("upper_rate"))), 
+#                                            max_min_graph_y_axis[2]), 
+#                col = "darkblue", size = 1.2, 
+#                arrow = arrow(ends = "both", angle = 90, length = unit(.2,"cm")))+
+#   geom_segment(x = 2005-0.2, y = unlist(graph_gbd_HIV_prev_rate%>%
+#                                           filter(year == 2005)%>%
+#                                           select(c("lower_rate"))), 
+#                xend = 2005-0.2, yend = min(unlist(graph_gbd_HIV_prev_rate%>%
+#                                                     filter(year == 2005)%>%
+#                                                     select(c("upper_rate"))), max_min_graph_y_axis[2]), 
+#                col = "darkblue", size = 1.2, 
+#                arrow = arrow(ends = "both", angle = 90, length = unit(.2,"cm")))+
+#   theme(text = element_text(size=18, family="Times New Roman"), 
+#         panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+#         panel.background = element_blank(), axis.line = element_line(colour = "black"),
+#         legend.position="top", legend.title = element_blank(), legend.text=element_text(size=22),
+#         plot.title = element_text(hjust = .5, size=18),
+#         legend.background = element_rect(colour = "lightgrey"),
+#         legend.box.background = element_rect(colour = "black"))+
+#   scale_x_continuous(name = 'y', breaks=c(seq(from = 1990, to = 2017, by = 3)))+
+#   scale_color_manual(values=c(colors_for_program_graph_line))+
+#   scale_fill_manual(values=c(colors_for_program_graph_fill))+
+#   ylab('HIV prevalence rate,\n per 100K individuals')+
+#   scale_shape_manual(values=c(16, 8))
+# 
+# setwd(outdir)
+# file_name<-paste0(region_name_temp, "_HIV_prev_calib.png")
+# png(file_name, width = 800, height = 500)
+# print(HIV_prev_rate_graph_temp)
+# dev.off()
+# file_name<-paste0(region_name_temp, "_TBHIV_mort_calib.png")
+# png(file_name, width = 800, height = 500)
+# print(TBHIV_mort_rate_graph_temp)
+# dev.off()
+# file_name<-paste0(region_name_temp, "_TB_inc_calib.png")
+# png(file_name, width = 800, height = 500)
+# print(TB_inc_rate_graph_temp)
+# dev.off()
+
+

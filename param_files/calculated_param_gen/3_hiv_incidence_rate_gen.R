@@ -168,7 +168,10 @@ for(i in 1:length(unique(hiv_inc_df$region_name))){
     select(-c('sex'))%>%
     filter(program_id != 3,
            region_name == region_name_temp)%>%
-    mutate(program_name = if_else(program_id == 1, "Program 1 (p = 1)", "Program 2 and 3 (p = 2, 3)"))%>%
+    #mutate(program_name = if_else(program_id == 1, "Standard, facility-based ART and TPT\ncare delivery (p = 1)",
+    #                              "Community-based ART with TPT\ncare delivery (p = 2)"))%>%
+    mutate(program_name = if_else(program_id == 1, "Standard, facility-based\nART care delivery",
+                                  "Community-based\nART care delivery"))%>%
     filter(year <= 2027)
   
   hiv_inc_plot_male<-ggplot(data=hiv_inc_df_graph_male) +
@@ -198,7 +201,10 @@ for(i in 1:length(unique(hiv_inc_df$region_name))){
     select(-c('sex'))%>%
     filter(program_id != 3,
            region_name == region_name_temp)%>%
-    mutate(program_name = if_else(program_id == 1, "Program 1 (p = 1)", "Program 2 and 3 (p = 2, 3)"))%>%
+    #mutate(program_name = if_else(program_id == 1, " Standard, facility-based ART and TPT\ncare delivery (p = 1)",
+    #                              "Community-based ART with TPT\ncare delivery (p = 2)"))%>%
+    mutate(program_name = if_else(program_id == 1, "Standard, facility-based\nART care delivery",
+                                  "Community-based\nART care delivery"))%>%
     filter(year <= 2027)
   
   hiv_inc_plot_female<-ggplot(data=hiv_inc_df_graph_female) +
@@ -221,7 +227,7 @@ for(i in 1:length(unique(hiv_inc_df$region_name))){
           legend.box.background = element_rect(colour = "black"))+
     scale_shape_manual(values=c(8, 2))
   
-  setwd(graph_outdir)
+  setwd(paste0(graph_outdir, '/dissertation'))
   png(paste0("hiv_inc_plot_female", region_name_temp, ".png"), width = 600, height = 440)
   print(hiv_inc_plot_female)
   dev.off()
